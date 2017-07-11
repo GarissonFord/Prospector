@@ -1,11 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
+//Enum to handle scoring 
+public enum ScoreEvent {
+	draw,
+	mine,
+	mindGold,
+	gameWin,
+	gameLoss
+}
 
 public class Prospector : MonoBehaviour {
 
 	static public Prospector 	S;
+	static public int SCORE_FROM_PREV_ROUND = 0;
+	static public int HIGH_SCORE;
+
 	public Deck					deck;
 	public TextAsset			deckXML;
 
@@ -20,12 +32,24 @@ public class Prospector : MonoBehaviour {
 	public CardProspector target;
 	public List<CardProspector> tableau;
 	public List<CardProspector> discardPile;
+	public List<CardProspector> drawPile;
+
+	//Fields to track score
+	public int chain = 0; //# of cards in a run
+	public int scoreRun = 0;
+	public int score = 0;
 
 	void Awake(){
 		S = this;
+		//Check for a high score in Player Prefs
+		if(PlayerPrefs.HasKey("ProspectorHighScore")){
+			HIGH_SCORE = PlayerPrefs.GetInt("ProspectorHighScore");
+		}
+		//Add score from last round, which will be >0 if it was a win
+		score += SCORE_FROM_PREV_ROUND;
+		//Reset
+		SCORE_FROM_PREV_ROUND = 0;
 	}
-
-	public List<CardProspector> drawPile;
 
 	void Start() {
 		deck = GetComponent<Deck> ();
@@ -118,7 +142,8 @@ public class Prospector : MonoBehaviour {
 		case CardState.drawpile:
 			MoveToDiscard (target); //Move the target to the discard pile
 			MoveToTarget (Draw ()); //Move the next drawn card to the target
-			UpdateDrawPile ();      
+			UpdateDrawPile (); 
+			ScoreManager (ScoreEvent.draw);
 			break;
 		case CardState.tableau:
 			//Clicking card in tableau will check if it's a valid play
@@ -137,6 +162,7 @@ public class Prospector : MonoBehaviour {
 			tableau.Remove (cd);
 			MoveToTarget (cd);
 			SetTableauFaces ();
+			ScoreManager (ScoreEvent.mine);
 			break;
 		}
 
@@ -245,11 +271,53 @@ public class Prospector : MonoBehaviour {
 
 	void GameOver(bool won) {
 		if (won) {
-			print ("Game Over. You won!. :)");
+			//print ("Game Over. You won!. :)");
+			ScoreManager(ScoreEvent.gameWin);
 		} else {
-			print ("Game Over. You Lost. :(");
+			//print ("Game Over. You Lost. :(");
+			ScoreManager(ScoreEvent.gameLoss);
 		}
 
-		Application.LoadLevel ("_Prospector_Scene_0");
+		//Application.LoadLevel ("_Prospector_Scene_0");
+		SceneManager.LoadScene("_Prospector_Scene_0");
+	}
+
+	//Score handler
+	void ScoreManager(ScoreEvent sEvt) {
+		switch (sEvt) {
+		case ScoreEvent.draw:
+		case ScoreEvent.gameWin:
+		case ScoreEvent.gameLoss:
+			chain = 0;
+			score += scoreRun;
+			scoreRun = 0;
+			break;
+		case ScoreEvent.mine:
+			chain++;
+			scoreRun += chain;
+			break;
+		}
+
+		switch (sEvt) {
+		case ScoreEvent.gameWin:
+			//Add the score to the next round 
+			Prospector.SCORE_FROM_PREV_ROUND = score;
+			print ("You won this round! Round score; " + score);
+			break;
+		case ScoreEvent.gameLoss:
+			//Check against high score
+			if (Prospector.HIGH_SCORE <= score) {
+				print ("You got the high score! High score: " + score);
+				Prospector.HIGH_SCORE = score;
+				PlayerPrefs.SetInt ("ProspectorHighScore", score);
+			} else {
+				print ("Your final score for the game was: " + score);
+			}
+			break;
+		default:
+			print ("score: " + score + " scoreRun:" + scoreRun + " chain:" + chain);
+			break;
+		}
+
 	}
 }
