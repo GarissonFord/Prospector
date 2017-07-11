@@ -15,9 +15,15 @@ public class Card : MonoBehaviour {
 	public GameObject back;     // back of card;
 	public CardDefinition def;  // from DeckXML.xml		
 
+	//List of SpriteRenderer components of this object
+	public SpriteRenderer[] spriteRenderers;
+
+	void Start() {
+		SetSortOrder(0);
+	}
 	
 	// property
-	public bool faceUP {
+	public bool faceUp {
 		get {
 			return (!back.activeSelf);
 		}		
@@ -25,6 +31,50 @@ public class Card : MonoBehaviour {
 			back.SetActive(!value);
 		}
 	}	
+
+	//If spriteRenderers is not yet defined, this does so
+	public void PopulateSpriteRenderers() {
+		if (spriteRenderers == null || spriteRenderers.Length == 0) {
+			spriteRenderers = GetComponentsInChildren<SpriteRenderer> ();
+		}
+	}
+
+	//Sets sortingLayerName on all SR components
+	public void SetSortingLayerName(string tSLN) {
+		PopulateSpriteRenderers ();
+
+		foreach (SpriteRenderer tSR in spriteRenderers) {
+			tSR.sortingLayerName = tSLN;
+		}
+	}
+
+	public void SetSortOrder(int sOrd) {
+		PopulateSpriteRenderers ();
+
+		//White background of the card is on the bottom (sOrd)
+		//Then the pips, decorators, face and such (sOrd + 1)
+		//The back is on top when visible (sOrd + 2)
+
+		//Iterate through all spriteRenderers
+		foreach (SpriteRenderer tSR in spriteRenderers) {
+			if (tSR.gameObject == this.gameObject) {
+				tSR.sortingOrder = sOrd;
+				continue;
+			}
+
+			switch (tSR.gameObject.name) {
+			case "back":
+				tSR.sortingOrder = sOrd + 2;
+
+				break;
+			case "face":
+			default:
+				tSR.sortingOrder = sOrd + 1;
+				break;
+			}
+		}
+	}
+
 } // class Card
 
 [System.Serializable]
