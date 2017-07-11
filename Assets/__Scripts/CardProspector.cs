@@ -18,4 +18,9 @@ public class CardProspector : Card {
 	//If it's a tableau card, matches to a Layout XML id
 	public int layoutID;
 	public SlotDef slotDef;
+
+	override public void OnMouseUpAsButton() {
+		Prospector.S.CardClicked (this);
+		base.OnMouseUpAsButton ();
+	}
 }
