@@ -51,6 +51,11 @@ public class Prospector : MonoBehaviour {
 	public Text GTGameOver;
 	public Text GTRoundResult;
 	public Text highScore;
+	public Text scoreText;
+
+	void UpdateScore() {
+		scoreText.text = score.ToString();
+	}
 
 	void Awake(){
 		S = this;
@@ -66,6 +71,7 @@ public class Prospector : MonoBehaviour {
 		//Set up texts that show at the end of the round
 		highScore.text = "High Score: " + Utils.AddCommasToNumber(HIGH_SCORE);
 		GTGameOver.text = "";
+		UpdateScore();
 	}
 
 	void ShowResultGTs(bool show) {
@@ -298,7 +304,7 @@ public class Prospector : MonoBehaviour {
 		if (won) {
 			//print ("Game Over. You won!. :)");
 			ScoreManager(ScoreEvent.gameWin);
-			GTGameOver.text = "Round Over";
+			GTGameOver.text = "Round Won";
 		} else {
 			//print ("Game Over. You Lost. :(");
 			ScoreManager(ScoreEvent.gameLoss);
@@ -339,8 +345,9 @@ public class Prospector : MonoBehaviour {
 		case ScoreEvent.mine:
 			chain++;
 			scoreRun += chain;
+			//Create the FloatingScore
 			FloatingScore fs;
-
+			//Move it from the mousePosition to fsPosRun
 			Vector3 p0 = Input.mousePosition;
 			p0.x /= Screen.width;
 			p0.y /= Screen.height;
@@ -349,6 +356,7 @@ public class Prospector : MonoBehaviour {
 			fsPts.Add (fsPosMid);
 			fsPts.Add (fsPosRun);
 			fs = Scoreboard.S.CreateFloatingScore (chain, fsPts);
+			//Debug.Log ("Chain: " + chain + " FloatingScore: " + fs);
 			fs.fontSizes = new List<float> (new float[] { 4, 50, 28 });
 			if (fsRun == null) {
 				fsRun = fs;
@@ -359,6 +367,7 @@ public class Prospector : MonoBehaviour {
 			break;
 		}
 
+		//The second switch handles round wins and losses
 		switch (sEvt) {
 		case ScoreEvent.gameWin:
 			//Add the score to the next round 
@@ -377,9 +386,11 @@ public class Prospector : MonoBehaviour {
 			}
 			break;
 		default:
-			print ("score: " + score + " scoreRun:" + scoreRun + " chain:" + chain);
+			//Commented out console print meant to test the scoring system
+			//print ("score: " + score + " scoreRun:" + scoreRun + " chain:" + chain);
 			break;
 		}
 
+		UpdateScore ();
 	}
 }

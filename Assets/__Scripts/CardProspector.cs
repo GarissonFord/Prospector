@@ -21,6 +21,7 @@ public class CardProspector : Card {
 
 	override public void OnMouseUpAsButton() {
 		Prospector.S.CardClicked (this);
+		//Debug.Log (this);
 		base.OnMouseUpAsButton ();
 	}
 }
