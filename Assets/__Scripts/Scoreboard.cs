@@ -48,8 +48,9 @@ public class Scoreboard : MonoBehaviour {
 	public FloatingScore CreateFloatingScore(int amt, List<Vector3> pts) {
 		GameObject go = Instantiate (prefabFloatingScore) as GameObject;
 		go.transform.SetParent (canvas.transform, true);
-		Vector3 fsPos = new Vector3 (0.5f, 100.0f, 0.0f);
-		go.transform.position = fsPos;
+		//Vector3 fsPos = new Vector3 (0.5f, 130.0f, 0.0f);
+		//rt.localPosition = fsPos;
+		//rt.position = fsPos;
 		FloatingScore fs = go.GetComponent<FloatingScore> ();
 		fs.score = amt;
 		fs.reportFinishTo = this.gameObject;

@@ -45,6 +45,7 @@ public class Card : MonoBehaviour {
 
 		foreach (SpriteRenderer tSR in spriteRenderers) {
 			tSR.sortingLayerName = tSLN;
+			Debug.Log (tSLN);
 		}
 	}
 

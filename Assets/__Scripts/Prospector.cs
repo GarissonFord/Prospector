@@ -17,7 +17,7 @@ public class Prospector : MonoBehaviour {
 
 	static public Prospector 	S;
 	static public int SCORE_FROM_PREV_ROUND = 0;
-	static public int HIGH_SCORE;
+	static public int HIGH_SCORE = 0;
 
 	public float reloadDelay = 1f; //Delay between rounds
 
@@ -80,7 +80,6 @@ public class Prospector : MonoBehaviour {
 	}
 
 	void Start() {
-		Debug.Log ("Entering start in Prospector");
 		Scoreboard.S.score = score;
 
 		deck = GetComponent<Deck> ();
@@ -323,9 +322,9 @@ public class Prospector : MonoBehaviour {
 	void ScoreManager(ScoreEvent sEvt) {
 		List<Vector3> fsPts;
 		switch (sEvt) {
-		case ScoreEvent.draw:
-		case ScoreEvent.gameWin:
-		case ScoreEvent.gameLoss:
+		case ScoreEvent.draw: //drawing a card
+		case ScoreEvent.gameWin: //won round
+		case ScoreEvent.gameLoss: //lost round
 			chain = 0;
 			score += scoreRun;
 			scoreRun = 0;

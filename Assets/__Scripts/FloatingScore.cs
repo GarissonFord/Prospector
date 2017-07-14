@@ -63,6 +63,14 @@ public class FloatingScore : MonoBehaviour {
 		score += fs.score;
 	}
 
+	public void setPos(Vector3 pos) {
+		Vector2 pos2d = new Vector2 (pos.x, pos.y);
+		RectTransform rt = GetComponent<RectTransform> ();
+		rt.anchorMin = pos2d;
+		rt.anchorMax = pos2d;
+		rt.anchoredPosition3D = Vector3.zero;
+	}
+
 	void Update() {
 		//If not moving
 		if (state == FSState.idle) return;
@@ -73,7 +81,8 @@ public class FloatingScore : MonoBehaviour {
 		float uC = Easing.Ease (u, easingCurve);
 		if (u < 0) { //If u < 0, we shouldn't move yet
 			state = FSState.pre;
-			transform.position = bezierPts [0];
+			//transform.position = bezierPts [0];
+			setPos(bezierPts[0]);
 		} else {
 			if (u >= 1) { //u >=1 means we're done moving
 				uC = 1; //To avoid overshooting
@@ -92,7 +101,8 @@ public class FloatingScore : MonoBehaviour {
 			}
 			//Use Bezier curves to move
 			Vector3 pos = Utils.Bezier (uC, bezierPts);
-			transform.position = pos;
+			//transform.position = pos;
+			setPos (pos);
 			if (fontSizes != null && fontSizes.Count > 0) {
 				int size = Mathf.RoundToInt (Utils.Bezier (uC, fontSizes));
 				//GetComponent<GUIText>().fontSize = size;
